@@ -8,6 +8,7 @@ interface Result {
     wpm: number;
     accuracy: number;
     email?: string;
+    name?: string;
     createdAt: string;
 }
 
@@ -18,8 +19,9 @@ export default function Leaderboard() {
     useEffect(() => {
         const fetchResults = async () => {
             try {
-                const res = await fetch("/api/results");
+                const res = await fetch("/api/results", { cache: "no-store" }); // Disable cache
                 const data = await res.json();
+                console.log("Leaderboard data:", data);
                 if (data.success) {
                     setResults(data.data);
                 }
@@ -76,8 +78,8 @@ export default function Leaderboard() {
                                             <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
                                                 <FaUser className="text-gray-500 text-xs" />
                                             </div>
-                                            <span className={result.email ? "text-white font-medium" : "text-gray-500 italic"}>
-                                                {result.email ? result.email.split('@')[0] : 'Anonymous'}
+                                            <span className={result.name || result.email ? "text-white font-medium" : "text-gray-500 italic"}>
+                                                {result.name || (result.email ? result.email.split('@')[0] : 'Anonymous')}
                                             </span>
                                         </div>
                                     </td>

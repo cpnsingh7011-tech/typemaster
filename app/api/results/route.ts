@@ -12,11 +12,13 @@ export async function POST(req: Request) {
         // Check for user session
         const session = await getServerSession(authOptions);
         const email = session?.user?.email;
+        const name = session?.user?.name;
 
         const result = await Result.create({
             wpm,
             accuracy,
-            email // Save email if present, otherwise null
+            email, // Save email if present, otherwise null
+            name  // Save name if present
         });
 
         return NextResponse.json({ success: true, data: result }, { status: 201 });
@@ -28,9 +30,12 @@ export async function POST(req: Request) {
 export async function GET() {
     try {
         await connectDB();
+        console.log("Database connected, fetching results...");
         const results = await Result.find({}).sort({ createdAt: -1 }).limit(10);
+        console.log(`Fetched ${results.length} results`);
         return NextResponse.json({ success: true, data: results });
     } catch (error) {
+        console.error("Failed to fetch results:", error);
         return NextResponse.json({ success: false, error: "Failed to fetch results" }, { status: 500 });
     }
 }

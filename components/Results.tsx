@@ -20,31 +20,35 @@ const data = [
     { name: '30s', wpm: 60 },
 ];
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Results({ wpm, accuracy, onRestart }: ResultsProps) {
+    const hasSaved = useRef(false);
+
     useEffect(() => {
-        const saveResult = async () => {
-            try {
-                console.log("Attempting to save result:", { wpm, accuracy });
-                const res = await fetch("/api/results", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ wpm, accuracy }),
-                });
+        if (wpm > 0 && !hasSaved.current) {
+            hasSaved.current = true;
 
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
+            const saveResult = async () => {
+                try {
+                    console.log("Attempting to save result:", { wpm, accuracy });
+                    const res = await fetch("/api/results", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ wpm, accuracy }),
+                    });
+
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+
+                    const data = await res.json();
+                    console.log("Save result success:", data);
+                } catch (error) {
+                    console.error("Failed to save result:", error);
                 }
+            };
 
-                const data = await res.json();
-                console.log("Save result success:", data);
-            } catch (error) {
-                console.error("Failed to save result:", error);
-            }
-        };
-
-        if (wpm > 0) {
             saveResult();
         }
     }, [wpm, accuracy]);
