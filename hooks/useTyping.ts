@@ -29,10 +29,6 @@ export const useTyping = (initialTime: number = 30): UseTypingReturn => {
 
     const { timeLeft, startCountdown, stopCountdown, resetCountdown } = useCountdown(initialTime);
 
-    useEffect(() => {
-        // Initial load
-        resetTyping();
-    }, []);
 
     useEffect(() => {
         if (timeLeft === 0 && phase === "typing") {
@@ -80,6 +76,10 @@ export const useTyping = (initialTime: number = 30): UseTypingReturn => {
         setAccuracy(100);
         resetCountdown();
     }, [resetCountdown]);
+
+    useEffect(() => {
+        resetTyping();
+    }, [resetTyping]);
 
     const handleInput = useCallback((input: string) => {
         if (phase === "completed") return;

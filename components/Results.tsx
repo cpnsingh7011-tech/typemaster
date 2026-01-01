@@ -20,7 +20,35 @@ const data = [
     { name: '30s', wpm: 60 },
 ];
 
+import { useEffect } from "react";
+
 export default function Results({ wpm, accuracy, onRestart }: ResultsProps) {
+    useEffect(() => {
+        const saveResult = async () => {
+            try {
+                console.log("Attempting to save result:", { wpm, accuracy });
+                const res = await fetch("/api/results", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ wpm, accuracy }),
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+
+                const data = await res.json();
+                console.log("Save result success:", data);
+            } catch (error) {
+                console.error("Failed to save result:", error);
+            }
+        };
+
+        if (wpm > 0) {
+            saveResult();
+        }
+    }, [wpm, accuracy]);
+
     return (
         <div className="flex flex-col items-center justify-center w-full animate-in fade-in zoom-in duration-300">
             <h2 className="text-3xl font-bold text-gray-200 mb-8">Test Completed</h2>
